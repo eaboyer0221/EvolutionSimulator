@@ -1,8 +1,6 @@
 package src.java.domain;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -58,6 +56,12 @@ public class Individual {
         return new Gene(randomStartNode(), randomEndNode());
     }
 
+    public List<Gene> shuffleGenes(){
+        List<Gene> geneList = Arrays.stream(genes).toList();
+        Collections.shuffle(geneList);
+        return geneList;
+    }
+
     public Individual() {
         this.genes = new Gene[NUM_EDGES];
         for (int i = 0; i < genes.length; i++) {
@@ -66,7 +70,19 @@ public class Individual {
     }
 
     public Individual(List<Individual> parents) {
-        //todo take a piece of each parent and use it to make the individual
+        //make list of queues
+        List<PriorityQueue<Gene>> genePool = parents.stream().map(x -> x.shuffleGenes().stream().collect(Collectors.toCollection(PriorityQueue::new))).toList();
+
+        HashSet<Gene> genes = new HashSet<>(NUM_EDGES);
+        Iterator<PriorityQueue<Gene>> it = genePool.iterator();
+        while(genes.size() < NUM_EDGES) {
+            genes.add(it.next().remove());
+        }
+        this.genes = new Gene[NUM_EDGES];
+        Iterator<Gene> it2 = genes.iterator();
+        for (int i = 0; i < genes.size(); i++) {
+            this.genes[i] = it2.next();
+        }
     }
 
     public static NeuralNode randomEndNode() {
