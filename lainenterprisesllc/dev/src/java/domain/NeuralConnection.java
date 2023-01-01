@@ -1,11 +1,11 @@
 package src.java.domain;
 
 
-public class Gene<StartNode, EndNode> {
+public class NeuralConnection<StartNode, EndNode> {
     private StartNode start;
     private EndNode end;
 
-    public Gene(StartNode start, EndNode end) {
+    public NeuralConnection(StartNode start, EndNode end) {
         this.start = start;
         this.end = end;
     }
