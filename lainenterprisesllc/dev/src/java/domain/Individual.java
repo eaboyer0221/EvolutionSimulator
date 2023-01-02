@@ -3,24 +3,16 @@ package src.java.domain;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Individual {
+public class Individual extends PhysicalItem {
 
     public static final Random RANDOM = new Random();
-    private static Individual genome_instance;
     public static final int NUM_EDGES = 8;
     private final NeuralConnection[] genes;
     public int x;
     public int y;
     private final float responsiveness;
+    public int pheromoneLevel;
 
-
-    public static Individual getInstance()
-    {
-        if (genome_instance == null)
-            genome_instance = new Individual();
-
-        return genome_instance;
-    }
 
     static Predicate<NeuralNode> intermediatePredicate = x -> x.nodeTypes.contains(NodeType.END) && x.nodeTypes.contains(NodeType.START);
     static Predicate<NeuralNode> sensoryPredicate = x -> !x.nodeTypes.contains(NodeType.END);
@@ -75,7 +67,9 @@ public class Individual {
         return geneList;
     }
 
-    public Individual() {
+    public Individual(int x, int y) {
+        this.x = x;
+        this.y = y;
         this.genes = new NeuralConnection[NUM_EDGES];
         this.responsiveness = RANDOM.nextFloat();
         for (int i = 0; i < genes.length; i++) {
@@ -119,4 +113,6 @@ public class Individual {
 
         //todo update coordinates for individual
     }
+
+
 }
