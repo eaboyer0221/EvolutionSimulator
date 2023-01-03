@@ -1,4 +1,4 @@
-package src.java.domain;
+package java.domain;
 
 import java.util.Optional;
 
@@ -12,5 +12,5 @@ public class GridLocation {
     public void decayPheromones() {
         pheromoneLevel /= 2;
     }
-    public float pheromoneLevel;
+    public int pheromoneLevel;
 }

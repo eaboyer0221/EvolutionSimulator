@@ -1,17 +1,20 @@
-package src.java.domain;
+package java.domain;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Individual extends PhysicalItem {
 
     public static final Random RANDOM = new Random();
     public static final int NUM_EDGES = 8;
-    private final NeuralConnection[] genes;
+    private final List<NeuralConnection<NeuralNode, NeuralNode>> genes;
     public int x;
     public int y;
     private final float responsiveness;
     public int pheromoneLevel;
+	public boolean isDead;
+
 
 
     static Predicate<NeuralNode> intermediatePredicate = x -> x.nodeTypes.contains(NodeType.END) && x.nodeTypes.contains(NodeType.START);
@@ -20,7 +23,7 @@ public class Individual extends PhysicalItem {
     public static final NeuralNode[] sensoryNodes = getNeuralNodes(actionPredicate);
 
     private static NeuralNode[] getNeuralNodes(Predicate<NeuralNode> actionPredicate) {
-        var nodes = Arrays.stream(NeuralNode.values()).filter(actionPredicate).toList();
+        var nodes = Arrays.stream(NeuralNode.values()).filter(actionPredicate).collect(Collectors.toList());
         var array = new NeuralNode[nodes.size()];
         Iterator<NeuralNode> it = nodes.iterator();
         for (int i = 0; i < array.length;) {array[i++] = it.next();}
@@ -61,37 +64,36 @@ public class Individual extends PhysicalItem {
         return new NeuralConnection<>(randomStartNode(), randomEndNode());
     }
 
-    public List<NeuralConnection> shuffleGenes(){
-        List<NeuralConnection> geneList = Arrays.stream(genes).toList();
-        Collections.shuffle(geneList);
-        return geneList;
+    public List<NeuralConnection<NeuralNode, NeuralNode>> shuffleGenes(){
+        Collections.shuffle(genes);
+        return genes;
     }
 
     public Individual(int x, int y) {
         this.x = x;
         this.y = y;
-        this.genes = new NeuralConnection[NUM_EDGES];
+        this.genes = new ArrayList<>(NUM_EDGES);
         this.responsiveness = RANDOM.nextFloat();
-        for (int i = 0; i < genes.length; i++) {
-            genes[i] = randomGene();
+        for (int i = 0; i < NUM_EDGES; i++) {
+            genes.add(0,  randomGene());
         }
     }
 
     public Individual(List<Individual> parents) {
         //make list of queues
-        List<PriorityQueue<NeuralConnection>> genePool = parents.stream().map(x -> new PriorityQueue<>(x.shuffleGenes())).toList();
-        List<Float> responsivenesses = parents.stream().map(Individual::getResponsiveness).toList();
+        List<PriorityQueue<NeuralConnection<NeuralNode, NeuralNode>>> genePool = parents.stream().map(x -> new PriorityQueue<>(x.shuffleGenes())).collect(Collectors.toList());
+        List<Float> responsivenesses = parents.stream().map(Individual::getResponsiveness).collect(Collectors.toList());
         this.responsiveness = responsivenesses.get(RANDOM.nextInt(responsivenesses.size()));
 
         HashSet<NeuralConnection<NeuralNode, NeuralNode>> genes = new HashSet<>(NUM_EDGES);
-        Iterator<PriorityQueue<NeuralConnection>> it = genePool.iterator();
+        Iterator<PriorityQueue<NeuralConnection<NeuralNode, NeuralNode>>> it = genePool.iterator();
         while(genes.size() < NUM_EDGES) {
             genes.add(it.next().remove());
         }
-        this.genes = new NeuralConnection[NUM_EDGES];
+        this.genes = new ArrayList<>(NUM_EDGES);
         Iterator<NeuralConnection<NeuralNode, NeuralNode>> it2 = genes.iterator();
         for (int i = 0; i < genes.size(); i++) {
-            this.genes[i] = it2.next();
+            this.genes.add(0, it2.next());
         }
         //todo randomly mutate the inherited aspects of the individual
     }
@@ -108,11 +110,29 @@ public class Individual extends PhysicalItem {
         return nextRandomNode(endNodes);
     }
 
-    public void takeAction() {
-        //todo make a decision on where to move
-
-        //todo update coordinates for individual
+    private boolean takeAction(HashMap<Direction, SensorStats> directionStats, int age) {
+		boolean isDead = false;
+        // Todo: make a decision on where to move
+        // Todo: update coordinates for individual
+		return isDead;
     }
-
-
+	public boolean isDeadAfterTurn(HashMap<Direction, SensorStats> directionStats, int age) {
+		return takeAction(directionStats, age);
+	}
+	
+	@Override public boolean equals(Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(!( o instanceof Individual )) {
+			return false;
+		}
+		Individual that = (Individual)o;
+		return x == that.x && y == that.y;
+	}
+	
+	@Override public int hashCode() {
+		return Objects.hash(x, y);
+	}
 }
+
