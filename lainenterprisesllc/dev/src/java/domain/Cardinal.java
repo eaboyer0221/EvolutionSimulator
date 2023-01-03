@@ -1,7 +1,19 @@
 package java.domain;
 
+import java.util.Arrays;
+import java.util.InputMismatchException;
+
 public class Cardinal {
 	public final Theta theta;
+	
+	public static InterCardinal.Theta from(Neuron neuron) {
+		if(!neuron.direction.isCardinal()) {
+			throw new InputMismatchException();
+		}
+		return Arrays.stream(InterCardinal.Theta.values())
+		 .filter(x -> x.angle == neuron.degrees)
+		 .findAny().get();
+	}
 	
 	enum Theta implements Direction {
 		_0_DEGREES(0),
@@ -31,6 +43,10 @@ public class Cardinal {
 				 this == _90_DEGREES ? y:
 				 this == _180_DEGREES ? x:
 				 /*this ==_270_DEGREES ?*/ height - y;
+		}
+		
+		@Override public boolean isCardinal() {
+			return true;
 		}
 	}
 	

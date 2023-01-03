@@ -44,26 +44,15 @@ public class Evolution {
 		}
 	}
 	
-	private HashMap<Direction, SensorStats> getSensorStats(int x, int y) {
-		HashMap<Direction, SensorStats> directionStats = new HashMap<>();
-		Arrays.stream(Cardinal.Theta.values())
+	private HashMap<Neuron, Double> getSensorStats(int x, int y) {
+		HashMap<Neuron, Double> directionStats = new HashMap<>();
+		Arrays.stream(NeuralNode.values())
 		 .forEach(
 		  it -> {
-			 directionStats.put(it, new SensorStats(
-			  map.getPheromoneGradientInDirection(it, x, y),
-			  map.populationDensityInDirection(it, x, y),
-			  it.getDistanceToBorderInDirection(x, y, map.width, map.height)
-			 ));
+			 directionStats.put(it.neuron, map.getPheromoneGradientInDirection(it.neuron.direction, x, y));
+			 directionStats.put(it.neuron, (double)map.populationDensityInDirection(Cardinal.from(it.neuron), x, y));
+			 directionStats.put(it.neuron, (double)it.neuron.direction.getDistanceToBorderInDirection(x, y, map.width, map.height));
 		  });
-		 Arrays.stream(InterCardinal.Theta.values())
-		 .forEach(
-		  it -> {
-			 directionStats.put(it, new SensorStats(
-			  map.getPheromoneGradientInDirection(it, x, y),
-			  map.populationDensityInDirection(it, x, y),
-			  it.getDistanceToBorderInDirection(x, y, map.width, map.height)
-			 ));
-		 });
 		return directionStats;
 	}
 }

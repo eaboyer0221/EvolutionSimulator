@@ -5,6 +5,7 @@ public interface Direction {
 	public Pair<Integer, Integer> getStepSizes();
 	
 	int getDistanceToBorderInDirection(int x, int y, int width, int height);
-	
+	public boolean isCardinal();
+	public String name();
 }
 

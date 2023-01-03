@@ -33,6 +33,10 @@ public class InterCardinal {
 			 /*this ==_315_DEGREES ?*/ minimumBorderDistance(x, y, width, height, _270_DEGREES, _0_DEGREES);
 		}
 		
+		@Override public boolean isCardinal() {
+			return false;
+		}
+		
 		private static int minimumBorderDistance(int x, int y, int width, int height,
 		 Cardinal.Theta degrees1, Cardinal.Theta degrees2) {
 			return Math.min(

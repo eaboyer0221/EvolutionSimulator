@@ -15,15 +15,13 @@ public class Individual extends PhysicalItem {
     public int pheromoneLevel;
 	public boolean isDead;
 
-
-
     static Predicate<NeuralNode> intermediatePredicate = x -> x.nodeTypes.contains(NodeType.END) && x.nodeTypes.contains(NodeType.START);
     static Predicate<NeuralNode> sensoryPredicate = x -> !x.nodeTypes.contains(NodeType.END);
     static Predicate<NeuralNode> actionPredicate = x -> !x.nodeTypes.contains(NodeType.START);
     public static final NeuralNode[] sensoryNodes = getNeuralNodes(actionPredicate);
 
-    private static NeuralNode[] getNeuralNodes(Predicate<NeuralNode> actionPredicate) {
-        var nodes = Arrays.stream(NeuralNode.values()).filter(actionPredicate).collect(Collectors.toList());
+    public	 static NeuralNode[] getNeuralNodes(Predicate<NeuralNode> actionPredicate) {
+        var nodes = Arrays.stream(NeuralNode.values()).filter(actionPredicate).toList();
         var array = new NeuralNode[nodes.size()];
         Iterator<NeuralNode> it = nodes.iterator();
         for (int i = 0; i < array.length;) {array[i++] = it.next();}
@@ -82,7 +80,7 @@ public class Individual extends PhysicalItem {
     public Individual(List<Individual> parents) {
         //make list of queues
         List<PriorityQueue<NeuralConnection<NeuralNode, NeuralNode>>> genePool = parents.stream().map(x -> new PriorityQueue<>(x.shuffleGenes())).collect(Collectors.toList());
-        List<Float> responsivenesses = parents.stream().map(Individual::getResponsiveness).collect(Collectors.toList());
+        List<Float> responsivenesses = parents.stream().map(Individual::getResponsiveness).toList();
         this.responsiveness = responsivenesses.get(RANDOM.nextInt(responsivenesses.size()));
 
         HashSet<NeuralConnection<NeuralNode, NeuralNode>> genes = new HashSet<>(NUM_EDGES);
@@ -110,13 +108,23 @@ public class Individual extends PhysicalItem {
         return nextRandomNode(endNodes);
     }
 
-    private boolean takeAction(HashMap<Direction, SensorStats> directionStats, int age) {
+    private boolean takeAction(HashMap<Neuron, Double> directionStats, int age) {
 		boolean isDead = false;
+		for(NeuralNode startNode: startNodes) {
+			var value = directionStats.get(startNode.neuron);
+			
+		}
+		directionStats.entrySet().stream().forEach(entry -> {
+			Neuron neuron = entry.getKey();
+			Double value = entry.getValue();
+			// Todo, do something with the Neruon and value
+		});
         // Todo: make a decision on where to move
         // Todo: update coordinates for individual
 		return isDead;
     }
-	public boolean isDeadAfterTurn(HashMap<Direction, SensorStats> directionStats, int age) {
+	
+	public boolean isDeadAfterTurn(HashMap<Neuron, Double> directionStats, int age) {
 		return takeAction(directionStats, age);
 	}
 	
@@ -124,10 +132,9 @@ public class Individual extends PhysicalItem {
 		if(this == o) {
 			return true;
 		}
-		if(!( o instanceof Individual )) {
+		if(!( o instanceof Individual that )) {
 			return false;
 		}
-		Individual that = (Individual)o;
 		return x == that.x && y == that.y;
 	}
 	
