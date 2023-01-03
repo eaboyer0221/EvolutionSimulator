@@ -1,4 +1,4 @@
-package src.java.domain;
+package java.domain;
 
 public enum NodeType {
     START,
