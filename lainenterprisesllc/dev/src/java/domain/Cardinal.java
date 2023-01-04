@@ -4,53 +4,63 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 
 public class Cardinal {
-	public final Theta theta;
+	public final PiOverTwoTimes piOverTwoTimes;
 	
-	public static InterCardinal.Theta from(Neuron neuron) {
-		if(!neuron.direction.isCardinal()) {
+	/*public static InterCardinal.PiOverFourTimes from(Degrees degrees) {
+		if(!degrees.isCardinal()) {
 			throw new InputMismatchException();
 		}
-		return Arrays.stream(InterCardinal.Theta.values())
-		 .filter(x -> x.angle == neuron.degrees)
+		return Arrays.stream(InterCardinal.PiOverFourTimes.values())
+		 .filter(x -> x.degrees.value == degrees.value)
 		 .findAny().get();
 	}
-	
-	enum Theta implements Direction {
-		_0_DEGREES(0),
-		_90_DEGREES(90),
-		_180_DEGREES(180),
-		_270_DEGREES(270),
+	*/
+	enum PiOverTwoTimes implements DirectionalNeighbor<InterCardinal.PiOverFourTimes> {
+		ZERO(Degrees._0),
+		ONE(Degrees._90),
+		TWO(Degrees._180),
+		THREE(Degrees._270),
 		;
-		public final int angle;
+		public final Degrees degrees;
+		private InterCardinal.PiOverFourTimes next;
+		private InterCardinal.PiOverFourTimes previous;
 		
-		Theta(int i) {
-			this.angle = i;
+		PiOverTwoTimes(Degrees i) {
+			this.degrees = i;
 		}
 		
-		@Override public int value() {
-			return this.angle;
+		@Override public Degrees value() {
+			return this.degrees;
 		}
 		
 		public Pair<Integer, Integer> getStepSizes() {
-			return this == _0_DEGREES ? new Pair<>(1, 0):
-				 this == _90_DEGREES ? new Pair<>(0, 1):
-				 this == _180_DEGREES ? new Pair<>(-1, 0):
+			return this == ZERO ? new Pair<>(1, 0):
+				 this == ONE ? new Pair<>(0, 1):
+				 this == TWO ? new Pair<>(-1, 0):
 				 /*this ==_270_DEGREES ?*/ new Pair<>(0, -1);
 		}
 		
 		@Override public int getDistanceToBorderInDirection(int x, int y, int width, int height) {
-				return this == _0_DEGREES ? width - x:
-				 this == _90_DEGREES ? y:
-				 this == _180_DEGREES ? x:
+				return this == ZERO ? width - x:
+				 this == ONE ? y:
+				 this == TWO ? x:
 				 /*this ==_270_DEGREES ?*/ height - y;
 		}
 		
 		@Override public boolean isCardinal() {
 			return true;
 		}
+		
+		@Override public InterCardinal.PiOverFourTimes getNextAngle() {
+			return this.next;
+		}
+		
+		@Override public InterCardinal.PiOverFourTimes getPreviousAngle() {
+			return this.previous;
+		}
 	}
 	
-	public Cardinal(Theta theta) {
-		this.theta = theta;
+	public Cardinal(PiOverTwoTimes piOverTwoTimes) {
+		this.piOverTwoTimes = piOverTwoTimes;
 	}
 }

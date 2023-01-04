@@ -1,5 +1,6 @@
 package java.domain;
 
+import java.domain.sensory.sensoryconcepts.PhysicalItem;
 import java.util.Optional;
 
 public class GridLocation {

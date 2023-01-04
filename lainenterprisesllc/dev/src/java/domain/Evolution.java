@@ -1,9 +1,10 @@
 package java.domain;
 
+import java.domain.sensory.emission.Individual;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import static java.domain.Individual.RANDOM;
+import static java.domain.sensory.emission.Individual.RANDOM;
 
 public class Evolution {
 	public final int numberOfIndividuals;
@@ -45,14 +46,16 @@ public class Evolution {
 	}
 	
 	private HashMap<Neuron, Double> getSensorStats(int x, int y) {
-		HashMap<Neuron, Double> directionStats = new HashMap<>();
-		Arrays.stream(NeuralNode.values())
-		 .forEach(
-		  it -> {
-			 directionStats.put(it.neuron, map.getPheromoneGradientInDirection(it.neuron.direction, x, y));
-			 directionStats.put(it.neuron, (double)map.populationDensityInDirection(Cardinal.from(it.neuron), x, y));
-			 directionStats.put(it.neuron, (double)it.neuron.direction.getDistanceToBorderInDirection(x, y, map.width, map.height));
+		HashMap<Degrees, Double> directionStats = new HashMap<>();
+		var map = new HashMap<Neuron, Double>(Neuron.values().length);
+		Arrays.stream(Degrees.values())
+		 .forEach(it -> {
+			 directionStats.put(it, it.getPheromoneGradientInDirection(this.map, x, y));
+			 // directionStats.put(it.neuron, map.getPheromoneGradientInDirection(it.neuron.directionalNeighbor, x, y));
+			 // directionStats.put(it.neuron, (double)map.populationDensityInDirection(it.neuron.degrees), x, y));
+			 // directionStats.put(it.neuron, (double)it.neuron.directionalNeighbor.getDistanceToBorderInDirection(x, y, map.width, map.height));
 		  });
-		return directionStats;
+		
+		return  map;
 	}
 }

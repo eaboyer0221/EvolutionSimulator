@@ -1,5 +1,10 @@
-package java.domain;
+package java.domain.sensory.emission;
 
+import java.domain.*;
+import java.domain.sensory.detection.EyeBall;
+import java.domain.sensory.sensoryconcepts.PhysicalItem;
+import java.domain.sensory.detection.Nose;
+import java.domain.sensory.detection.Ear;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -14,6 +19,13 @@ public class Individual extends PhysicalItem {
     private final float responsiveness;
     public int pheromoneLevel;
 	public boolean isDead;
+	
+	public EyeBall eyeBall;
+	public Armpit armpit;
+	public Nose nose;
+	public Ear ear;
+	public VoiceBox voiceBox;
+	
 
     static Predicate<NeuralNode> intermediatePredicate = x -> x.nodeTypes.contains(NodeType.END) && x.nodeTypes.contains(NodeType.START);
     static Predicate<NeuralNode> sensoryPredicate = x -> !x.nodeTypes.contains(NodeType.END);
@@ -141,5 +153,6 @@ public class Individual extends PhysicalItem {
 	@Override public int hashCode() {
 		return Objects.hash(x, y);
 	}
+	
 }
 
