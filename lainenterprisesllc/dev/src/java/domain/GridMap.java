@@ -1,11 +1,12 @@
 package java.domain;
 
+import java.domain.sensory.emission.Individual;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.domain.Cardinal.Theta.*;
+import static java.domain.Cardinal.PiOverTwoTimes.*;
 
 public class GridMap {
 	public final int width;
@@ -101,16 +102,16 @@ public class GridMap {
 	}
 	
 	/**
-	 * Get the gradient of pheromone in the given direction.
-	 * @return a list of Integers representing the pheromone gradient, radiating from direction.  
+	 * Get the gradient of pheromone in the given directionalNeighbor.
+	 * @return a list of Integers representing the pheromone gradient, radiating from directionalNeighbor.  
 	 */
 	public Double getPheromoneGradientInDirection(
-	 Direction direction, 
+	 DirectionalNeighbor directionalNeighbor, 
 	 int i,
 	 int j
 	) {
 		
-		return getCollinearLocations(direction, i, j)
+		return getCollinearLocations(directionalNeighbor, i, j)
 		 .collect(Collectors.averagingInt(x -> x.pheromoneLevel));
 	}
 	
@@ -119,12 +120,12 @@ public class GridMap {
 	 * @return a List of all collinear locations along the given axis. 
 	 */
 	private Stream<GridLocation> getCollinearLocations(
-	 Direction direction,
+	 DirectionalNeighbor directionalNeighbor,
 	 int i,
 	 int j
 	) {
 		
-		Pair<Integer, Integer> stepSizes = direction.getStepSizes();
+		Pair<Integer, Integer> stepSizes = directionalNeighbor.getStepSizes();
 		int xStep = stepSizes.getKey();
 		int yStep = stepSizes.getValue();
 		List<GridLocation> locations = new ArrayList<>();
@@ -147,20 +148,20 @@ public class GridMap {
 	) {
 		
 		List<GridLocation> locations = new ArrayList<>();
-		switch(cardinal.theta) {
-			case _0_DEGREES -> IntStream.range(x + 1, width).forEach(itX -> 
+		switch(cardinal.piOverTwoTimes) {
+			case ZERO -> IntStream.range(x + 1, width).forEach(itX -> 
 			 IntStream.range(0, height).forEach(itY -> 
 			  locations.add(map[itX][itY])));
 			
-			case _90_DEGREES -> IntStream.range(0, width).forEach(itX -> 
+			case ONE -> IntStream.range(0, width).forEach(itX -> 
 		 IntStream.range(0, y - 1).forEach(itY -> 
 		  locations.add(map[itX][itY])));
 			
-			case _180_DEGREES -> IntStream.range(0, x).forEach(itX -> 
+			case TWO -> IntStream.range(0, x).forEach(itX -> 
 		 IntStream.range(0, height).forEach(itY -> 
 		  locations.add(map[itX][itY])));
 			
-			case _270_DEGREES -> IntStream.range(0, width).forEach(itX -> 
+			case THREE -> IntStream.range(0, width).forEach(itX -> 
 		 IntStream.range(y + 1, height).forEach(itY -> 
 		  locations.add(map[itX][itY])));
 		}
@@ -180,15 +181,15 @@ public class GridMap {
 		var stream = getCollinearLocations(interCardinal.theta, x, y);
 		return Stream.concat(stream, 
 		switch(interCardinal.theta) {
-			case _45_DEGREES -> getGridLocationStream(x, y, stream, _0_DEGREES, _90_DEGREES);
-			case _135_DEGREES-> getGridLocationStream(x, y, stream, _90_DEGREES, _180_DEGREES);
-			case _225_DEGREES-> getGridLocationStream(x, y, stream, _180_DEGREES, _270_DEGREES);
-			case _315_DEGREES-> getGridLocationStream(x, y, stream, _270_DEGREES, _0_DEGREES);
+			case ONE -> getGridLocationStream(x, y, stream, ZERO, ONE);
+			case THREE -> getGridLocationStream(x, y, stream, ONE, TWO);
+			case FIVE -> getGridLocationStream(x, y, stream, TWO, THREE);
+			case SEVEN -> getGridLocationStream(x, y, stream, THREE, ZERO);
 		});
 	}
 	
 	private Stream<GridLocation> getGridLocationStream(int x, int y, Stream<GridLocation> stream,
-	 Cardinal.Theta angle1, Cardinal.Theta angle2) {
+	 Cardinal.PiOverTwoTimes angle1, Cardinal.PiOverTwoTimes angle2) {
 		stream = Stream.concat(stream, getAcuteSectorInDirection(new Cardinal(angle1), x, y));
 		return Stream.concat(stream, getAcuteSectorInDirection(new Cardinal(angle2), x, y));
 	}
@@ -203,29 +204,29 @@ public class GridMap {
 	 int y
 	) {
 		List<GridLocation> list = new ArrayList<>();
-		switch(cardinal.theta) {
-			case _0_DEGREES -> {
+		switch(cardinal.piOverTwoTimes) {
+			case ZERO -> {
 				for(int j = x + 1; j < width; j++) {
 					for(int i = y - j; i < height && i <= y + j; i++) {
 						list.add(map[i][j]);
 					}
 				}
 			}
-			case _90_DEGREES -> {
+			case ONE -> {
 				for(int i = 0; i < height && i < y; i++) {
 					for(int j = x - y + 1; j < width && j < x + y; j++) {
 						list.add(map[i][j]);
 					}
 				}
 			}			
-			case _180_DEGREES -> {
+			case TWO -> {
 				for(int j = x - 1; j >= 0; j--) {
 					for(int i = y - j; i < height && i <= y + j; i++) {
 						list.add(map[i][j]);
 					}
 				}
 			}			
-			case _270_DEGREES -> {
+			case THREE -> {
 				for(int i = y + 1; i < height; i++) {
 					for(int j = x - y + 1; j < width && j < x + y; j++) {
 						list.add(map[i][j]);
@@ -247,28 +248,28 @@ public class GridMap {
 	) {
 		List<GridLocation> list = new ArrayList<>();
 		switch(interCardinal.theta) {
-			case _45_DEGREES -> {
+			case ONE -> {
 				for(int i = x + 1; i < width; i++) {
 					for(int j =0; j < y; j++) {
 						list.add(map[j][i]);
 					}
 				}
 			}
-			case _135_DEGREES-> {
+			case THREE -> {
 				for(int i = 0; i < x; i++) {
 					for(int j =0; j < y; j++) {
 						list.add(map[j][i]);
 					}
 				}
 			}
-			case _225_DEGREES-> {
+			case FIVE -> {
 				for(int i = 0; i < x; i++) {
 					for(int j = y + 1; j < height; j++) {
 						list.add(map[j][j]);
 					}
 				}
 			}
-			case _315_DEGREES-> {
+			case SEVEN -> {
 				for(int i = x + 1; i < width; i++) {
 					for(int j = y + 1; j < height; j++) {
 						list.add(map[j][j]);
@@ -279,7 +280,7 @@ public class GridMap {
 		return list.stream();
 	}
 	
-	public float populationDensityInDirection(Cardinal.Theta direction, int x, int y) {
+	public float populationDensityInDirection(Degrees direction, int x, int y) {
 		var locs = getCollinearLocations(direction, x, y);
 		return locs.filter(it -> it.item.isPresent() 
 		  && it.item.get() instanceof Individual)
@@ -287,7 +288,7 @@ public class GridMap {
 		  it -> it.pheromoneLevel)).floatValue();
 	}
 	
-	public float populationDensityInDirection(InterCardinal.Theta direction, int x, int y) {
+	public float populationDensityInDirection(InterCardinal.PiOverFourTimes direction, int x, int y) {
 		var locs = getCollinearLocations(direction, x, y);
 		return locs.filter(it -> it.item.isPresent() 
 		  && it.item.get() instanceof Individual)
